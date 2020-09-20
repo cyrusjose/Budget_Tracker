@@ -2,16 +2,9 @@ let transactions = [];
 let myChart;
 const transactionForm = createTransactionForm();
 const transactionAPI = createTransactionAPI();
-fetch("/api/transaction")
-  .then(response => {
-    return response.json();
-  })
-  .then(data => {
-    // save db data on global variable
-    transactions = data;
-  });
 
-createTransactionForm = () => {
+initalizeTransactions();
+function createTransactionForm() {
   const nameEl = document.querySelector("#t-name");
   const amountEl = document.querySelector("#t-amount");
   const errorEl = document.querySelector(".form .error");
@@ -44,9 +37,9 @@ createTransactionForm = () => {
   };
 
   return Object.freeze({ transaction, validation, clearForm, displayError });
-};
+}
 
-createTransactionAPI = () => {
+function createTransactionAPI() {
   const create = transaction => {
     return fetch("/api/transaction", {
       method: "POST",
@@ -67,22 +60,22 @@ createTransactionAPI = () => {
   };
 
   return Object.freeze({ create, fetchAll });
-};
+}
 
-renderTransactionChart = () => {
+function renderTransactionChart() {
   populateTotal();
   populateTable();
   populateChart();
-};
+}
 
-initalizeTransactions = () => {
+function initalizeTransactions() {
   transactionAPI.fetchAll().then(data => {
     transaction = data;
     renderTransactionChart();
   });
-};
+}
 
-populateTotal = () =>{
+function populateTotal() {
   // reduce transaction amounts to a single total value
   let total = transactions.reduce((total, t) => {
     return total + parseInt(t.value);
@@ -92,7 +85,7 @@ populateTotal = () =>{
   totalEl.textContent = total;
 }
 
-populateTable = () =>{
+function populateTable() {
   let tbody = document.querySelector("#tbody");
   tbody.innerHTML = "";
 
@@ -108,7 +101,7 @@ populateTable = () =>{
   });
 }
 
-populateChart = () => {
+function populateChart() {
   // copy array and reverse it
   let reversed = transactions.slice().reverse();
   let sum = 0;
@@ -148,7 +141,7 @@ populateChart = () => {
   });
 }
 
-sendTransaction = isAdding => {
+function sendTransaction(isAdding) {
   if (!transactionForm.validation()) return;
   // Create a record
   const transaction = transactionForm.transaction();
@@ -163,16 +156,19 @@ sendTransaction = isAdding => {
   populateTable();
   populateTotal();
 
-  transactionAPI.create(transaction).then(data => {
-    if (data.errors) {
-      transactionForm.showError("Missing Information");
-    } else {
+  transactionAPI
+    .create(transaction)
+    .then(data => {
+      if (data.errors) {
+        transactionForm.showError("Missing Information");
+      } else {
+        transactionForm.clear();
+      }
+    })
+    .catch(() => {
       transactionForm.clear();
-    }
-  }).catch(() => {
-    transactionForm.clear();
-  });
-};
+    });
+}
 
 document.querySelector("#add-btn").onclick = function () {
   sendTransaction(true);
