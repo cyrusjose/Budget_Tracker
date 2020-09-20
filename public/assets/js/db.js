@@ -26,13 +26,13 @@ request.onsuccess = event => {
   if (navigator.onLine) checkDatabase();
 };
 
-saveRecord = record => {
+function saveRecord (record) {
   const transaction = db.transaction("pending", "readwrite");
   const store = transaction.objectStore("pending");
   store.add(record);
 };
 
-checkDatabase = () => {
+function checkDatabase () {
   const transaction = db.transaction("pending", "readonly");
   const store = transaction.objectStore("pending");
   const getAll = store.getAll();
@@ -57,4 +57,4 @@ checkDatabase = () => {
   };
 };
 
-window.addEventListener("online", checkDatabase());
+window.addEventListener("online", checkDatabase);
