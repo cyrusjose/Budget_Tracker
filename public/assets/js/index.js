@@ -1,6 +1,6 @@
 let transactions = [];
 let myChart;
-
+const transactionForm = createTransactionForm();
 fetch("/api/transaction")
   .then(response => {
     return response.json();
@@ -14,6 +14,38 @@ fetch("/api/transaction")
     populateChart();
   });
 
+createTransactionForm = () => {
+  const nameEl = document.querySelector("#t-name");
+  const amountEl = document.querySelector("#t-amount");
+  const errorEl = document.querySelector(".form .error");
+
+  const displayError = message => {
+    errorEl.textContent = message;
+  };
+  const validation = () => {
+    if (nameEl.value === "" || amountEl.value === "") {
+      displayError("Missing Information");
+      return false;
+    } else {
+      displayError("");
+      return true;
+    }
+  };
+
+  const transaction = () => {
+    return {
+      name: nameEl.value,
+      value: amountEl.value,
+      date: new Date().toISOString()
+    };
+  };
+
+  const clearForm = () => {
+    nameEl.value = "";
+    amountEl.value = "";
+    showError("");
+  };
+};
 function populateTotal() {
   // reduce transaction amounts to a single total value
   let total = transactions.reduce((total, t) => {
@@ -65,15 +97,17 @@ function populateChart() {
   let ctx = document.getElementById("myChart").getContext("2d");
 
   myChart = new Chart(ctx, {
-    type: 'line',
-      data: {
-        labels,
-        datasets: [{
-            label: "Total Over Time",
-            fill: true,
-            backgroundColor: "#6666ff",
-            data
-        }]
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Total Over Time",
+          fill: true,
+          backgroundColor: "#6666ff",
+          data
+        }
+      ]
     }
   });
 }
@@ -87,8 +121,7 @@ function sendTransaction(isAdding) {
   if (nameEl.value === "" || amountEl.value === "") {
     errorEl.textContent = "Missing Information";
     return;
-  }
-  else {
+  } else {
     errorEl.textContent = "";
   }
 
@@ -111,7 +144,7 @@ function sendTransaction(isAdding) {
   populateChart();
   populateTable();
   populateTotal();
-  
+
   // also send to server
   fetch("/api/transaction", {
     method: "POST",
@@ -121,33 +154,32 @@ function sendTransaction(isAdding) {
       "Content-Type": "application/json"
     }
   })
-  .then(response => {    
-    return response.json();
-  })
-  .then(data => {
-    if (data.errors) {
-      errorEl.textContent = "Missing Information";
-    }
-    else {
+    .then(response => {
+      return response.json();
+    })
+    .then(data => {
+      if (data.errors) {
+        errorEl.textContent = "Missing Information";
+      } else {
+        // clear form
+        nameEl.value = "";
+        amountEl.value = "";
+      }
+    })
+    .catch(err => {
+      // fetch failed, so save in indexed db
+      saveRecord(transaction);
+
       // clear form
       nameEl.value = "";
       amountEl.value = "";
-    }
-  })
-  .catch(err => {
-    // fetch failed, so save in indexed db
-    saveRecord(transaction);
-
-    // clear form
-    nameEl.value = "";
-    amountEl.value = "";
-  });
+    });
 }
 
-document.querySelector("#add-btn").onclick = function() {
+document.querySelector("#add-btn").onclick = function () {
   sendTransaction(true);
 };
 
-document.querySelector("#sub-btn").onclick = function() {
+document.querySelector("#sub-btn").onclick = function () {
   sendTransaction(false);
 };
