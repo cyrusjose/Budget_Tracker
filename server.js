@@ -1,6 +1,5 @@
-if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config();
-}
+require("dotenv").config();
+
 const express = require("express");
 // const logger = require("morgan");
 const mongoose = require("mongoose");
@@ -27,8 +26,8 @@ mongoose.connect(process.env.DATABASE_URL, {
   useUnifiedTopology: true
 });
 
-db.on("error", error => console.error(error))
-db.once("open", () => console.log("connected to mongoose"))
+db.on("error", error => console.error(error));
+db.once("open", () => console.log("connected to mongoose"));
 
 // routes
 app.use(require("./routes/api.js"));
