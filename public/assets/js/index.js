@@ -1,6 +1,7 @@
 let transactions = [];
 let myChart;
 const transactionForm = createTransactionForm();
+const transactionAPI = createTransactionAPI();
 fetch("/api/transaction")
   .then(response => {
     return response.json();
@@ -45,7 +46,40 @@ createTransactionForm = () => {
     amountEl.value = "";
     showError("");
   };
+
+  return Object.freeze({ transaction, validation, clearForm, displayError });
 };
+
+createTransactionAPI = () => {
+  const create = transaction => {
+    return fetch("/api/transaction", {
+      method: "POST",
+      body: JSON.stringify(transaction),
+      headers: {
+        Accept: "application/json, text/plain, */*",
+        "Content-Type": "application/json"
+      }
+    }).then(response => {
+      return response.json();
+    });
+  };
+
+  const fetchAll = () => {
+    return fetch("/api/transaction").then(response => {
+      return response.json();
+    });
+  };
+
+  return Object.freeze({ create, fetchAll });
+};
+
+initalizeTransactions = () => {
+transactionAPI.fetchAll().then(data => {
+  transaction = data; 
+})
+
+};
+
 function populateTotal() {
   // reduce transaction amounts to a single total value
   let total = transactions.reduce((total, t) => {
