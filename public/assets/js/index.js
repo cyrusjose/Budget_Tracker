@@ -82,7 +82,7 @@ initalizeTransactions = () => {
   });
 };
 
-function populateTotal() {
+populateTotal = () =>{
   // reduce transaction amounts to a single total value
   let total = transactions.reduce((total, t) => {
     return total + parseInt(t.value);
@@ -92,7 +92,7 @@ function populateTotal() {
   totalEl.textContent = total;
 }
 
-function populateTable() {
+populateTable = () =>{
   let tbody = document.querySelector("#tbody");
   tbody.innerHTML = "";
 
@@ -108,7 +108,7 @@ function populateTable() {
   });
 }
 
-function populateChart() {
+populateChart = () => {
   // copy array and reverse it
   let reversed = transactions.slice().reverse();
   let sum = 0;
