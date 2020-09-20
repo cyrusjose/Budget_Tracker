@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 const express = require("express");
-// const logger = require("morgan");
+const logger = require("morgan");
 const mongoose = require("mongoose");
 const compression = require("compression");
 
@@ -11,7 +11,7 @@ const app = express();
 
 const db = mongoose.connection;
 
-// app.use(logger("dev"));
+app.use(logger("dev"));
 
 app.use(compression());
 app.use(express.urlencoded({ extended: true }));
