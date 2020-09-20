@@ -9,10 +9,6 @@ fetch("/api/transaction")
   .then(data => {
     // save db data on global variable
     transactions = data;
-
-    populateTotal();
-    populateTable();
-    populateChart();
   });
 
 createTransactionForm = () => {
@@ -73,11 +69,17 @@ createTransactionAPI = () => {
   return Object.freeze({ create, fetchAll });
 };
 
-initalizeTransactions = () => {
-transactionAPI.fetchAll().then(data => {
-  transaction = data; 
-})
+renderTransactionChart = () => {
+  populateTotal();
+  populateTable();
+  populateChart();
+};
 
+initalizeTransactions = () => {
+  transactionAPI.fetchAll().then(data => {
+    transaction = data;
+    renderTransactionChart();
+  });
 };
 
 function populateTotal() {
